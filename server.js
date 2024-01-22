@@ -1,0 +1,40 @@
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const {connectDb} = require('./db/dbConnection');
+const { farmerRoutes, allRoutes, adminRouters, mccRouters,mccUserRouters,milkProductionRouters } = require('./routes/index');
+require('colors');
+const app = express();
+
+app.use(cors());
+
+//connect dabatabase
+connectDb;
+
+
+app.use(express.json());
+// making the api
+// api for authentication
+app.use('/mpas/authentication/v1',allRoutes); 
+//farmer routes
+app.use('/mpas/farmerNews', farmerRoutes);
+//admin routes
+app.use('/mpas/veterian', adminRouters);
+//mccRoutes
+app.use('/mpas', mccRouters)
+//mmccUserRoutes
+app.use('/mpas', mccUserRouters)
+//milkProductionRoutes
+app.use('/mpas', milkProductionRouters)
+
+
+// conncet to database
+
+app.listen(process.env.PORT, ()=>{
+    mongoose.connect(process.env.MONGO)
+    .then(()=>{
+    console.log(`listening on port ${process.env.PORT}` .bgMagenta);
+    })
+    .catch(err=> console.log("couldn't connect to the database") )
+})
