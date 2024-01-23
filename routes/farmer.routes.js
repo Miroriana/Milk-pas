@@ -2,7 +2,7 @@
  * @swagger
  * components:
  *   schemas:
- *     farmer:
+ *     Farmer:
  *       type: object
  *       required:
  *         - fullName
@@ -38,6 +38,136 @@
  *         quantity:
  *           type: string
  *           description: Quantity related to the farmer
+ */
+
+
+/** 
+ * @swagger
+ * tags: 
+ *   - name: Farmer
+ *     description: The farmer managing API
+ * /mpas/farmerNews/farmer/allFarmers:
+ *   get:
+ *     summary: List of all farmer
+ *     tags:
+ *       - Farmer
+ *     responses:
+ *       200:
+ *         description: This is the farmer list
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/farmer'
+ */
+/** 
+ * @swagger
+ 
+ * /mpas/farmerNews/farmer/addFarmer:
+ *   post:
+ *     summary: Create a farmer
+ *     tags:
+ *       - Farmer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Farmer'
+ *     responses:
+ *       200:
+ *         description: This farmer is created
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Farmer'
+ *       500:
+ *         description: Some server error
+*/
+/**
+ * @swagger
+ * /mpas/farmerNews/farmer/updateFarmers:
+ *   patch:
+ *     summary: Update farmer
+ *     tags:
+ *       - Farmer
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Farmer'
+ *     responses:
+ *       '200':
+ *         description: Farmer updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Farmer'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
+ */
+/**
+ * @swagger
+ * /mpas/farmerNews/farmer/deleteFarmer:
+ *   delete:
+ *     summary: removing a farmer
+ *     tags:
+ *       - Farmer
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Farmer'
+ *     responses:
+ *       '200':
+ *         description: Farmer deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Farmer'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
+ */
+/**
+ * @swagger
+ * /mpas/farmerNews/farmer/findFarmer:
+ *   get:
+ *     summary:  Find farmer by ID
+ *     tags:
+ *       - Farmer
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Farmer is found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Farmer'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
  */
 
 const express = require("express");

@@ -2,7 +2,7 @@
  * @swagger
  * components:
  *   schemas:
- *     veterinary:
+ *     Veterinary:
  *       type: object
  *       required:
  *         - fullName
@@ -43,13 +43,13 @@
 /** 
  * @swagger
  * tags: 
- *   - name: Veterinaries
+ *   - name: Veterinary
  *     description: The veterinary managing API
  * /mpas/veterian/vet/allVets:
  *   get:
  *     summary: List of all veterinaries
  *     tags:
- *       - vet
+ *       - Veterinary
  *     responses:
  *       200:
  *         description: This is the veterinary list
@@ -62,14 +62,12 @@
  */
 /** 
  * @swagger
- * tags: 
- *   - name: Veterinaries
- *     description: The veterinary managing API
+ 
  * /mpas/veterian/vet/addVet:
  *   post:
  *     summary: Create a veterinary
  *     tags:
- *       - vet
+ *       - Veterinary
  *     requestBody:
  *       required: true
  *       content:
@@ -89,14 +87,11 @@
 
 /**
  * @swagger
- * tags:
- *   - name: Veterinaries
- *     description: The veterinary managing API
  * /mpas/veterian/vet/updateVet:
  *   patch:
  *     summary: Update veterinary
  *     tags:
- *       - vet
+ *       - Veterinary
  *     parameters:
  *       - in: query
  *         name: id
@@ -122,14 +117,11 @@
  */
 /**
  * @swagger
- * tags:
- *   - name: Veterinaries
- *     description: The veterinary managing API
  * /mpas/veterian/vet/removeVet:
  *   delete:
  *     summary: removing a veterinary
  *     tags:
- *       - vet
+ *       - Veterinary
  *     parameters:
  *       - in: query
  *         name: id
@@ -156,14 +148,11 @@
 
 /**
  * @swagger
- * tags:
- *   - name: Veterinaries
- *     description: The veterinary managing API
  * /mpas/veterian/vet/findVet:
  *   get:
  *     summary:  Find veterinary by ID
  *     tags:
- *       - vet
+ *       - Veterinary
  *     parameters:
  *       - in: query
  *         name: id
@@ -181,9 +170,6 @@
  *       '400':
  *         description: Bad request
  */
-
-
-
 
 
 
