@@ -58,8 +58,131 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/vet'
+ *                 $ref: '#/components/schemas/veterinary'
  */
+/** 
+ * @swagger
+ * tags: 
+ *   - name: Veterinaries
+ *     description: The veterinary managing API
+ * /mpas/veterian/vet/addVet:
+ *   post:
+ *     summary: Create a veterinary
+ *     tags:
+ *       - vet
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/veterinary'
+ *     responses:
+ *       200:
+ *         description: This veterinary is created
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/veterinary'
+ *       500:
+ *         description: Some server error
+*/
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Veterinaries
+ *     description: The veterinary managing API
+ * /mpas/veterian/vet/updateVet:
+ *   patch:
+ *     summary: Update veterinary
+ *     tags:
+ *       - vet
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/veterinary'
+ *     responses:
+ *       '200':
+ *         description: Veterinary updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/veterinary'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
+ */
+/**
+ * @swagger
+ * tags:
+ *   - name: Veterinaries
+ *     description: The veterinary managing API
+ * /mpas/veterian/vet/removeVet:
+ *   delete:
+ *     summary: removing a veterinary
+ *     tags:
+ *       - vet
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/veterinary'
+ *     responses:
+ *       '200':
+ *         description: Veterinary deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/veterinary'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Veterinaries
+ *     description: The veterinary managing API
+ * /mpas/veterian/vet/findVet:
+ *   get:
+ *     summary:  Find veterinary by ID
+ *     tags:
+ *       - vet
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Veterinary is found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/veterinary'
+ *       '500':
+ *         description: Some server error
+ *       '400':
+ *         description: Bad request
+ */
+
+
 
 
 
