@@ -1,170 +1,175 @@
-const Locations = require('../database/locations.json');
+const Locations = require("../database/locations.json");
 
 const asyncWrapper = (fn) => {
-    return async (req, res, next) => {
-        try {
-            await fn(req, res, next)
-        } catch (error) {
-            next(error)
-        }
+  return async (req, res, next) => {
+    try {
+      await fn(req, res, next);
+    } catch (error) {
+      next(error);
     }
-}
+  };
+};
 
-const provinceTranslator = asyncWrapper(async(req, res, next) => {
-    const EngProvinces = ['East', 'West', 'North', 'South', 'Kigali City'];
-    const KinyProvinces = ['Iburasirazuba', 'Iburengerazuba', 'Amajyaruguru', 'Amajyepfo', 'Umujyi wa Kigali'];
+const provinceTranslator = asyncWrapper(async (req, res, next) => {
+  const EngProvinces = ["East", "West", "North", "South", "Kigali City"];
+  const KinyProvinces = [
+    "Iburasirazuba",
+    "Iburengerazuba",
+    "Amajyaruguru",
+    "Amajyepfo",
+    "Umujyi wa Kigali",
+  ];
 
-    EngProvinces.forEach((element, index) => {
-        if (req.query.province === element) {
-            req.query.province = KinyProvinces[index];
-        }
-    });
+  EngProvinces.forEach((element, index) => {
+    if (req.query.province === element) {
+      req.query.province = KinyProvinces[index];
+    }
+  });
 
-    next();
-})
+  next();
+});
 
 // Find provinces
 const findProvinces = asyncWrapper(async (req, res, next) => {
-    var provinces = [];
-    Locations.provinces.forEach(province => {
-        provinces.push(province.name);
-    });
+  var provinces = [];
+  Locations.provinces.forEach((province) => {
+    provinces.push(province.name);
+  });
 
-    res.status(200).json({ provinces: provinces });
-})
+  res.status(200).json({ provinces: provinces });
+});
 
 // Find districts
 const findDistricts = asyncWrapper(async (req, res, next) => {
-    const { province: selectedProvince } = req.query;
+  const { province: selectedProvince } = req.query;
 
-    !selectedProvince ? selectedProvince = 'Umujyi wa Kigali' : selectedProvince;
+  !selectedProvince
+    ? (selectedProvince = "Umujyi wa Kigali")
+    : selectedProvince;
 
-    var districtData = []
-    Locations.provinces.forEach((province, index) => {
-        if (province.name === selectedProvince) {
-            districtData = province.districts;
-        }
-    });
-    
-    var districts = [];
-    districtData.forEach((district) => {
-        districts.push(district.name);
-    });
+  var districtData = [];
+  Locations.provinces.forEach((province, index) => {
+    if (province.name === selectedProvince) {
+      districtData = province.districts;
+    }
+  });
 
-    res.status(200).json({ districts: districts })
+  var districts = [];
+  districtData.forEach((district) => {
+    districts.push(district.name);
+  });
+
+  res.status(200).json({ districts: districts });
 });
 
 // Find sectors
 const findSectors = asyncWrapper(async (req, res, next) => {
-    const { 
-        province: selectedProvince, 
-        district: selectedDistrict 
-    } = req.query;
-    
-    var sectorData = [];
-    var districts = []
+  const { province: selectedProvince, district: selectedDistrict } = req.query;
 
-    Locations.provinces.forEach(province => {
-        if (province.name == selectedProvince) {
-            districts = province.districts;
-        }
-    })
+  var sectorData = [];
+  var districts = [];
 
-    districts.forEach((district) => {
-        if (district.name === selectedDistrict) {
-            sectorData = district.sectors;
-        }
-    });
+  Locations.provinces.forEach((province) => {
+    if (province.name == selectedProvince) {
+      districts = province.districts;
+    }
+  });
 
-    var sectors = [];
-    sectorData.forEach((sector) => {
-        sectors.push(sector.name);
-    });
+  districts.forEach((district) => {
+    if (district.name === selectedDistrict) {
+      sectorData = district.sectors;
+    }
+  });
 
-    res.status(200).json({ sectors: sectors })
+  var sectors = [];
+  sectorData.forEach((sector) => {
+    sectors.push(sector.name);
+  });
+
+  res.status(200).json({ sectors: sectors });
 });
 
 // Find cells
 const findCells = asyncWrapper(async (req, res, next) => {
-    const { 
-        province: selectedProvince, 
-        district: selectedDistrict, 
-        sector: selectedSector 
-    } = req.query;
-    
-    var districts = []
-    var sectors = [];
-    var cellsData = [];
-    var cells = [];
+  const {
+    province: selectedProvince,
+    district: selectedDistrict,
+    sector: selectedSector,
+  } = req.query;
 
-    Locations.provinces.forEach(province => {
-        if (province.name == selectedProvince) {
-            districts = province.districts;
-        }
-    })
+  var districts = [];
+  var sectors = [];
+  var cellsData = [];
+  var cells = [];
 
-    districts.forEach((district) => {
-        if (district.name === selectedDistrict) {
-            sectors = district.sectors;
-        }
-    });
+  Locations.provinces.forEach((province) => {
+    if (province.name == selectedProvince) {
+      districts = province.districts;
+    }
+  });
 
-    sectors.forEach((sector) => {
-        if (sector.name === selectedSector) {
-            cellsData = sector.cells;
-        }
-    });
+  districts.forEach((district) => {
+    if (district.name === selectedDistrict) {
+      sectors = district.sectors;
+    }
+  });
 
-    cellsData.forEach((cell) => {
-        cells.push(cell.name);
-    })
-    res.status(200).json({ cells: cells })
+  sectors.forEach((sector) => {
+    if (sector.name === selectedSector) {
+      cellsData = sector.cells;
+    }
+  });
+
+  cellsData.forEach((cell) => {
+    cells.push(cell.name);
+  });
+  res.status(200).json({ cells: cells });
 });
 
 // Find villages
 const findVillages = asyncWrapper(async (req, res, next) => {
-    const { 
-        province: selectedProvince, 
-        district: selectedDistrict, 
-        sector: selectedSector, 
-        cell: selectedCell 
-    } = req.query;
+  const {
+    province: selectedProvince,
+    district: selectedDistrict,
+    sector: selectedSector,
+    cell: selectedCell,
+  } = req.query;
 
-    var districts = []
-    var sectors = [];
-    var cells = [];
-    var villagesData = [];
-    var villages = [];
+  var districts = [];
+  var sectors = [];
+  var cells = [];
+  var villagesData = [];
+  var villages = [];
 
-    Locations.provinces.forEach(province => {
-        if (province.name == selectedProvince) {
-            districts = province.districts;
-        }
-    })
+  Locations.provinces.forEach((province) => {
+    if (province.name == selectedProvince) {
+      districts = province.districts;
+    }
+  });
 
-    districts.forEach((district) => {
-        if (district.name === selectedDistrict) {
-            sectors = district.sectors;
-        }
-    });
+  districts.forEach((district) => {
+    if (district.name === selectedDistrict) {
+      sectors = district.sectors;
+    }
+  });
 
-    sectors.forEach((sector) => {
-        if (sector.name === selectedSector) {
-            cells = sector.cells;
-        }
-    });
+  sectors.forEach((sector) => {
+    if (sector.name === selectedSector) {
+      cells = sector.cells;
+    }
+  });
 
-    cells.forEach((cell) => {
-        if (cell.name === selectedCell) {
-            villagesData = cell.villages;
-        }
-    });
+  cells.forEach((cell) => {
+    if (cell.name === selectedCell) {
+      villagesData = cell.villages;
+    }
+  });
 
-    villagesData.forEach(village => {
-        villages.push(village.name);
-    })
+  villagesData.forEach((village) => {
+    villages.push(village.name);
+  });
 
-    res.status(200).json({ villages: villages })
+  res.status(200).json({ villages: villages });
 });
 
 // console.log(findProvinces());
@@ -177,10 +182,10 @@ const findVillages = asyncWrapper(async (req, res, next) => {
 // console.log(findVillages('Iburasirazuba', 'Kayonza', 'Murama','Nyakanazi'));
 
 module.exports = {
-    findProvinces,
-    findDistricts,
-    findSectors,
-    findCells,
-    findVillages,
-    provinceTranslator
-}
+  findProvinces,
+  findDistricts,
+  findSectors,
+  findCells,
+  findVillages,
+  provinceTranslator,
+};

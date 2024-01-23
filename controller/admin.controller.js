@@ -2,18 +2,20 @@ const sendEmail = require("../utils/email");
 const VeterinaryModel = require("../models/admin.model");
 // const { UserSigninSchema } = require("../utils/validation");
 const errorHandler = require("../errors/errorhandler");
+//adding a veterinaryc
 
 const addVeterian = async (req, res, next) => {
-  const {email, ...rest} = req.body;
+  const { email, ...rest } = req.body;
   // var a = UserSigninSchema.validateAsync({email:req.body.email, password: req.body.password, nationalId: req.body.nationalId});
   try {
-    var veterianExists = await VeterinaryModel.findOne({ email: req.body.email });
-    if (veterianExists){
+    var veterianExists = await VeterinaryModel.findOne({
+      email: req.body.email,
+    });
+    if (veterianExists) {
       return res
         .status(200)
         .json({ message: "veterinary with this email already exists" });
-    }
-    else {
+    } else {
       var addedVeterinary = await VeterinaryModel.create(req.body);
       // sending email codes
       var senderEmail = addedVeterinary.email;
@@ -22,80 +24,91 @@ const addVeterian = async (req, res, next) => {
       sendEmail(senderEmail, subject, signUpLink);
 
       res.status(201).json({
-        message: "Veterinary is recorded successfully, email is sent to the veterinary",
-        veterian: addedVeterinary
+        message:
+          "Veterinary is recorded successfully, email is sent to the veterinary",
+        veterian: addedVeterinary,
       });
     }
   } catch (error) {
     next(errorHandler(500, error.message));
-  }};
+  }
+};
 
+// // remove veterinary
 
-  // // remove veterinary
- 
-  const removeVeterinary = async (req, res, next) => {
-    const {email, ...rest} = req.body;
-    try {
-        var deletedVeterinary = await VeterinaryModel.findByIdAndDelete(req.query.id);
-        console.log(deletedVeterinary);
-        if(deletedVeterinary){
-            res.status(200).json({
-                message:"Veterinary is Deleted",
-            });
-          var receiver = deletedVeterinary.body.email;
-          var theme = "Finished signing up your account";
-          var message= `<p>Hello <h3>${deletedVeterinary.fullName}</h3> </p> <br> You are no have been dismissed from your post`;
-          sendEmail(receiver, theme, message);
-        }else{
-          res.status(404).send('Veterinary not found!');
-        }
-    } catch (error) {
-        next(errorHandler(500, error.message));
-    }};
-  
-    //finding the Veterinary by id
-    const findVeterinaryById = async (req, res, next) => {
-      var veterinary = await VeterinaryModel.findById(req.query.id);
-      try {
-        if(veterinary === null){
-          return next(errorHandler(400,"No Veterinary with given ID"));
-        }
-        res.json({
-          message: "veterinary is found",
-          veterinary,
-        });
-      } catch (error) {
-        res.status(500).send(error);
-      }
-    };
-    //listing all the Veterinary recorded
-    const listOfVeterinary = async (req, res, next) => {
-      var veterinaryList = await VeterinaryModel.find();
-      try {
-        if(veterinaryList === null){
-          return next(errorHandler(400,"No Veterinary with given ID"));
-        }
-        res.json({
-          message: "this is the veterinary list",
-          veterinaryList,
-        });
-      } catch (error) {
-        res.status(500).send("you don't have any veterinary in the list");
-      }
-    };
-    //updating a veterinary's information according to his email
-    const updateVeterinary = async(req,res,next) =>{
-    
-        try {
-            var updatedVeterinary = await VeterinaryModel.findByIdAndUpdate({_id:req.query.id}, req.body);
-            res.status(200).json({
-                message:"The updated veterinary became",
-                updatedVeterinary 
-            });
-        } catch (error) {
-            res.status(500).send("can't be updated");
-        }
+const removeVeterinary = async (req, res, next) => {
+  const { email, ...rest } = req.body;
+  try {
+    var deletedVeterinary = await VeterinaryModel.findByIdAndDelete(
+      req.query.id
+    );
+    console.log(deletedVeterinary);
+    if (deletedVeterinary) {
+      res.status(200).json({
+        message: "Veterinary is Deleted",
+      });
+      var receiver = deletedVeterinary.body.email;
+      var theme = "Finished signing up your account";
+      var message = `<p>Hello <h3>${deletedVeterinary.fullName}</h3> </p> <br> You are no have been dismissed from your post`;
+      sendEmail(receiver, theme, message);
+    } else {
+      res.status(404).send("Veterinary not found!");
     }
-    
-    module.exports = { addVeterian, removeVeterinary,findVeterinaryById,listOfVeterinary,updateVeterinary};
-    
+  } catch (error) {
+    next(errorHandler(500, error.message));
+  }
+};
+
+//finding the Veterinary by id
+const findVeterinaryById = async (req, res, next) => {
+  var veterinary = await VeterinaryModel.findById(req.query.id);
+  try {
+    if (veterinary === null) {
+      return next(errorHandler(400, "No Veterinary with given ID"));
+    }
+    res.json({
+      message: "veterinary is found",
+      veterinary,
+    });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
+//listing all the Veterinary recorded
+const listOfVeterinary = async (req, res, next) => {
+  var veterinaryList = await VeterinaryModel.find();
+  try {
+    if (veterinaryList === null) {
+      return next(errorHandler(400, "No Veterinary with given ID"));
+    }
+    res.json({
+      message: "this is the veterinary list",
+      veterinaryList,
+    });
+  } catch (error) {
+    res.status(500).send("you don't have any veterinary in the list");
+  }
+};
+//updating a veterinary's information according to his email
+const updateVeterinary = async (req, res, next) => {
+  try {
+    var updatedVeterinary = await VeterinaryModel.findByIdAndUpdate(
+      { _id: req.query.id },
+      req.body
+    );
+    res.status(200).json({
+      message: "The updated veterinary became",
+      updatedVeterinary,
+    });
+  } catch (error) {
+    res.status(500).send("can't be updated");
+  }
+};
+
+module.exports = {
+  addVeterian,
+  removeVeterinary,
+  findVeterinaryById,
+  listOfVeterinary,
+  updateVeterinary,
+};

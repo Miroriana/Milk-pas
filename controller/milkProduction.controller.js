@@ -59,12 +59,10 @@ const addmilkProduction = async (req, res, next) => {
     next();
   } catch (error) {
     // Handle the error if the update fails
-    res
-      .status(500)
-      .send({
-        message: "Failed to save the milkProduction...",
-        error: error.message,
-      });
+    res.status(500).send({
+      message: "Failed to save the milkProduction...",
+      error: error.message,
+    });
   }
 };
 

@@ -8,7 +8,9 @@ const addFarmer = async (req, res, next) => {
   try {
     var farmerExists = await FarmerModel.findOne({ email: email });
     if (farmerExists)
-      return res.status(200).json({message: "Farmer with this email already exists"});
+      return res
+        .status(200)
+        .json({ message: "Farmer with this email already exists" });
     else {
       var addedFarmer = await FarmerModel.create(req.body);
       // const newFarmer = new FarmerModel(req.body);
@@ -25,25 +27,25 @@ const addFarmer = async (req, res, next) => {
 };
 // removing a recorded farmer
 const removeFarmer = async (req, res, next) => {
-try {
+  try {
     var deletedFarmer = await FarmerModel.findByIdAndDelete(req.query.id);
-    if(deletedFarmer){
-        res.status(200).json({
-            message:"Farmer is Deleted"
-        });
-    }else{
-        res.status(404).send('Farmer not found!');;
+    if (deletedFarmer) {
+      res.status(200).json({
+        message: "Farmer is Deleted",
+      });
+    } else {
+      res.status(404).send("Farmer not found!");
     }
-} catch (error) {
+  } catch (error) {
     res.status(500).send(error);
-}
+  }
 };
 //finding the farmer by id
 const findFarmerById = async (req, res, next) => {
   var farmerTBF = await FarmerModel.findById(req.query.id);
   try {
-    if(farmerTBF === null){
-      res.json({message:"the farmer was deleted"});
+    if (farmerTBF === null) {
+      res.json({ message: "the farmer was deleted" });
     }
     res.json({
       message: "farmer is found",
@@ -66,18 +68,26 @@ const listOfFarmer = async (req, res, next) => {
   }
 };
 //updating a farmer's information according to his email
-const updateFarmer = async(req,res,next) =>{
+const updateFarmer = async (req, res, next) => {
+  try {
+    var updatedFarmer = await FarmerModel.findOneAndUpdate(
+      { _id: req.query.id },
+      req.body
+    );
+    var farmer = await FarmerModel.find(updatedFarmer._id);
+    res.status(200).json({
+      message: "The updated farmer became",
+      farmer,
+    });
+  } catch (error) {
+    res.status(500).send("can't be deleted");
+  }
+};
 
-    try {
-        var updatedFarmer = await FarmerModel.findOneAndUpdate({_id:req.query.id}, req.body);
-        var farmer = await FarmerModel.find(updatedFarmer._id);
-        res.status(200).json({
-            message:"The updated farmer became",
-            farmer
-        });
-    } catch (error) {
-        res.status(500).send("can't be deleted");
-    }
-}
-
-module.exports = { listOfFarmer, findFarmerById, removeFarmer, addFarmer, updateFarmer };
+module.exports = {
+  listOfFarmer,
+  findFarmerById,
+  removeFarmer,
+  addFarmer,
+  updateFarmer,
+};
