@@ -1,7 +1,10 @@
 const sendEmail = require("../utils/email");
+const bcryptjs = require("bcryptjs");
 const VeterinaryModel = require("../models/admin.model");
 // const { UserSigninSchema } = require("../utils/validation");
 const errorHandler = require("../errors/errorhandler");
+const { generateRandomPassword } = require("../utility/generateRandomPassword");
+const sendVeterinaryEmail = require("../middlewares/veterinaryEmail");
 //adding a veterinaryc
 
 const addVeterian = async (req, res, next) => {
@@ -16,11 +19,18 @@ const addVeterian = async (req, res, next) => {
         .status(200)
         .json({ message: "veterinary with this email already exists" });
     } else {
+      let defaultPassword = generateRandomPassword(12);
+      let hashedPwd = bcryptjs.hashSync(defaultPassword, 10);
+
+      console.log("defaultPassword---", defaultPassword);
+
+      req.body.password = hashedPwd;
+
       var addedVeterinary = await VeterinaryModel.create(req.body);
       // sending email codes
       var senderEmail = addedVeterinary.email;
       var subject = "Finished signing up your account";
-      signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedVeterinary.email} <br> Password: ${addedVeterinary.password}  </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
+      signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedVeterinary.email} <br> Password: ${defaultPassword}  <br>  <br>   </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
       sendEmail(senderEmail, subject, signUpLink);
 
       res.status(201).json({

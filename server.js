@@ -39,15 +39,16 @@ app.use("/mpas", milkProductionRouters);
 const options = {
   definition: {
     openapi: "3.0.0",
-    info:{
-        title: "MPAS apis docs",
-        version: "0.1.0", 
-        description: "This is a simple Milk PAS API application made with Express and documented with Swagger",
-        contact :{
-            name: "milk production analytical system",
-            url: "milkpas.com",
-            email: "milkpas00@gmail.com"
-        }
+    info: {
+      title: "MPAS apis docs",
+      version: "0.1.0",
+      description:
+        "This is a simple Milk PAS API application made with Express and documented with Swagger",
+      contact: {
+        name: "milk production analytical system",
+        url: "milkpas.com",
+        email: "milkpas00@gmail.com",
+      },
     },
     servers: [
       {
