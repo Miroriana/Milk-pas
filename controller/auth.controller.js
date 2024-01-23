@@ -1,8 +1,4 @@
-const {
-  UserModel,
-  VeterinaryModel,
-  MccModel,
-} = require("../models/user.model");
+const { UserModel, MccModel } = require("../models/user.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const errorHandler = require("../errors/errorhandler");
@@ -14,7 +10,9 @@ const {
 const CustomError = require("../errors");
 const { default: statusCodes } = require("http-status-codes");
 const { v4: uuidv4 } = require("uuid");
+const { getToken } = require("../utility/webTokenValidation");
 const sendEmail = require("../utils/email");
+const VeterinaryModel = require("../models/admin.model");
 
 //sign up admin
 
@@ -60,8 +58,12 @@ const SignUp = async (req, res, next) => {
 const SignIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const validUser = await UserModel.findOne({ email: email });
-    if (!validUser) return next(errorHandler(401, "Invalid email or password"));
+    let validUser = await UserModel.findOne({ email: email });
+    if (!validUser) {
+      validUser = await VeterinaryModel.findOne({ email: email });
+      if (!validUser)
+        return next(errorHandler(401, "Invalid email or password"));
+    }
 
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword)
@@ -72,11 +74,21 @@ const SignIn = async (req, res, next) => {
 
     const expiryDate = new Date(Date.now() + 3600000); //1hour
 
-    res
-      .cookie("access token", token, { httpOnly: true, expires: expiryDate })
-      .status(200)
-      .json({ message: "you've signed in successfully", rest });
+    let Accesstoken = getToken({ _id: validUser._id, email: validUser.email });
+
+    res.status(200).json({
+      message: "Authorised!",
+      access_token: Accesstoken,
+      user: {
+        userId: validUser._id,
+        email: validUser.email,
+        fullNames: validUser.fullNames,
+        phoneNo: validUser.phoneNo,
+        role: validUser.role,
+      },
+    });
   } catch (error) {
+    console.log("Error loggin--", error);
     next(errorHandler(error));
   }
 };

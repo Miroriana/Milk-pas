@@ -15,35 +15,35 @@ const VeterinarySchema = new Schema({
       "Please provide a valid email",
     ],
   },
-  phoneNumber: {
-    type: String,
-    required: true,
-    unique: false,
-  },
   nationalId: {
     type: Number,
     required: true,
     unique: true,
   },
-  password: {
+  phoneNumber: {
     type: String,
-    required: true,
-    match: [
-      /(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/,
-      "Please provide a valid password",
-    ],
-  },
-  verified: {
-    type: String,
-    default: false,
+    required: false,
+    unique: false,
   },
   province: {
     type: String,
     required: true,
   },
-  sector: {
+  district: {
     type: String,
     required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  verified: {
+    type: String,
+    default: false,
+  },
+  role: {
+    type: String,
+    default: "veterinary",
   },
 });
 const VeterinaryModel = model("vet", VeterinarySchema);

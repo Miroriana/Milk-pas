@@ -1,69 +1,3 @@
-/**
- * @swagger
- * components:
- *   schemas:
- *     veterinary:
- *       type: object
- *       required:
- *         - fullName
- *         - email
- *         - phoneNumber
- *         - nationalId
- *         - verified
- *         - province
- *         - sector
- *         - description
- *       properties:
- *         fullName:
- *           type: string
- *           description: Name of the admin
- *         email:
- *           type: string
- *           description: Email of the admin
- *         phoneNumber:
- *           type: string
- *           description: Phone number of the admin
- *         nationalId:
- *           type: number
- *           description: National ID of the admin
- *         password:
- *           type: string
- *           description: Password of the admin
- *         verified:
- *           type: string
- *           description: Verification status of the admin
- *         province:
- *           type: string
- *           description: Province of the admin
- *         sector:
- *           type: string
- *           description: Sector of the admin
- */
-
-/** 
- * @swagger
- * tags: 
- *   - name: Veterinaries
- *     description: The veterinary managing API
- * /mpas/veterian/vet/allVets:
- *   get:
- *     summary: List of all veterinaries
- *     tags:
- *       - vet
- *     responses:
- *       200:
- *         description: This is the veterinary list
- *         content: 
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/vet'
- */
-
-
-
-
 const express = require("express");
 const {
   addVeterian,
@@ -74,6 +8,84 @@ const {
 } = require("../controller/admin.controller");
 
 const adminRouter = express.Router();
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     veterinarySchema:
+ *       type: object
+ *       required:
+ *         - fullName
+ *         - email
+ *         - nationalId
+ *         - phoneNumber
+ *         - province
+ *         - district
+ *       properties:
+ *         fullName:
+ *           type: string
+ *           description: Name of the veterinary
+ *           default: "Frank MUHIZI"
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: Email address of the veterinary
+ *           default: "frank@example.com"
+ *         nationalId:
+ *           type: integer
+ *           description: nationalId of the veterinary
+ *           default: 0987654321234567
+ *         phoneNumber:
+ *           type: string
+ *           description: Phone number of the veterinary
+ *           default: "+1234567890"
+ *         province:
+ *           type: string
+ *           description: Province where the veterinary is located
+ *           default: "Some Province"
+ *         district:
+ *           type: string
+ *           description: District where the veterinary is located
+ *           default: "Some District"
+ *       examples:
+ *         fullName: "Frank MUHIZI"
+ *         email: "frank@example.com"
+ *         nationalId: 0987654321234567
+ *         phoneNumber: "+1234567890"
+ *         province: "Some Province"
+ *         district: "Some District"
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: VETERINARY
+ *   description: The veterinary managing API
+ */
+
+/**
+ * @swagger
+ * /mpas/veterian/vet/addVet:
+ *   post:
+ *     summary: Add a new veterinary
+ *     tags: [VETERINARY]
+ *     requestBody:
+ *          required: true
+ *          content:
+ *            application/json:
+ *               schema:
+ *                   $ref: '#/components/schemas/veterinarySchema'
+ *     responses:
+ *       201:
+ *          description: The new veterinary added successfully
+ *          content:
+ *             application/json:
+ *               schema:
+ *                   $ref: '#/components/schemas/veterinarySchema'
+ *       500:
+ *          description: Internal Server Error
+ */
 
 adminRouter.post("/addVet", addVeterian);
 adminRouter.delete("/removeVet", removeVeterinary);
