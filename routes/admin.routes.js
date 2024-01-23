@@ -12,8 +12,6 @@ const adminRouter = express.Router();
 /**
  * @swagger
  * components:
- *   schemas:
- *     veterinarySchema:
  *       type: object
  *       required:
  *         - fullName
@@ -64,28 +62,6 @@ const adminRouter = express.Router();
  *   description: The veterinary managing API
  */
 
-/**
- * @swagger
- * /mpas/veterian/vet/addVet:
- *   post:
- *     summary: Add a new veterinary
- *     tags: [VETERINARY]
- *     requestBody:
- *          required: true
- *          content:
- *            application/json:
- *               schema:
- *                   $ref: '#/components/schemas/veterinarySchema'
- *     responses:
- *       201:
- *          description: The new veterinary added successfully
- *          content:
- *             application/json:
- *               schema:
- *                   $ref: '#/components/schemas/veterinarySchema'
- *       500:
- *          description: Internal Server Error
- */
 
 adminRouter.post("/addVet", addVeterian);
 adminRouter.delete("/removeVet", removeVeterinary);
