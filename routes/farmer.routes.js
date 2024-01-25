@@ -59,7 +59,7 @@
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/farmer'
+ *                 $ref: '#/components/schemas/Farmer'
  */
 /** 
  * @swagger
