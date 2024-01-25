@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 //veterinary model: mcc registration
 const mccSchema = new Schema({
-  fullName: {
+  mccName: {
     type: String,
     required: true,
   },

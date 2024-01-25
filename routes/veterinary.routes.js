@@ -5,17 +5,34 @@
  *     mcc:
  *       type: object
  *       required:
- *         - fullName
+ *         - mccName
+ *         - email
+ *         - phoneNumber
+ *         - password
+ *         - district
  *         - sector
  *         - description
  *       properties:
- *         fullName:
+ *         mccName:
  *           type: string
  *           description: Name of the MCC
+ *         email:
+ *           type: string
+ *           description: Email of the MCC
+ *         phoneNumber:
+ *           type: string
+ *           description: Phone number of the MCC
+ *         password:
+ *           type: string
+ *           description: Password of the MCC
+ *         district:
+ *           type: string
+ *           description: District of the MCC
  *         sector:
  *           type: string
  *           description: Sector of the MCC
  */
+
 /** 
  * @swagger
  * tags: 

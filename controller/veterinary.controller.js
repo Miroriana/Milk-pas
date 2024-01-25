@@ -4,7 +4,7 @@ const errorHandler = require("../errors/errorhandler");
 const MccModel = require("../models/veterian.model");
 
 const addMcc = async (req, res, next) => {
-  const { fullName, ...rest } = req.body;
+  const { mccName, ...rest } = req.body;
 //   try {
 //     var mccExists = await MccModel.findOne({ fullName: req.body.fullName });
 //     if (mccExists) {
@@ -31,7 +31,7 @@ const addMcc = async (req, res, next) => {
 // };
 try {
   // Check if an Mcc with the given fullName already exists
-  var mccExists = await MccModel.findOne({ fullName: req.body.fullName });
+  var mccExists = await MccModel.findOne({ mccName: req.body.mccName });
 
   if (mccExists) {
     return res.status(200).json({ message: "Mcc with this name already exists" });
