@@ -5,22 +5,56 @@ const MccModel = require("../models/veterian.model");
 
 const addMcc = async (req, res, next) => {
   const { fullName, ...rest } = req.body;
-  try {
-    var mccExists = await MccModel.findOne({ fullName: req.body.fullName });
-    if (mccExists) {
-      return res
-        .status(200)
-        .json({ message: "mcc with this name already exists" });
+//   try {
+//     var mccExists = await MccModel.findOne({ fullName: req.body.fullName });
+//     if (mccExists) {
+//       return res
+//         .status(200)
+//         .json({ message: "mcc with this name already exists" });
+
+//     // }else if{
+//     //   var mccExists = await mccModel.findOne({ email: email });
+//     // if (emailExists)
+//     //   return res
+//     //     .status(200)
+//     //     .json({ message: "Farmer with this email already exists" });
+//     }else {
+//       var addedMcc = await MccModel.create(req.body);
+//       res.status(201).json({
+//         message: "mcc is recorded successfully",
+//         mcc: addedMcc,
+//       });
+//     }
+//   } catch (error) {
+//     next(errorHandler(500, error.message));
+//   }
+// };
+try {
+  // Check if an Mcc with the given fullName already exists
+  var mccExists = await MccModel.findOne({ fullName: req.body.fullName });
+
+  if (mccExists) {
+    return res.status(200).json({ message: "Mcc with this name already exists" });
+  } else {
+    // Check if an Mcc with the given email already exists
+    var emailExists = await MccModel.findOne({ email: req.body.email });
+
+    if (emailExists) {
+      return res.status(200).json({ message: "Mcc with this email already exists" });
     } else {
+      // Create a new Mcc if none of the conditions are met
       var addedMcc = await MccModel.create(req.body);
+
       res.status(201).json({
-        message: "mcc is recorded successfully",
+        message: "Mcc is recorded successfully",
         mcc: addedMcc,
       });
     }
-  } catch (error) {
-    next(errorHandler(500, error.message));
   }
+} catch (error) {
+  // Handle errors
+  next(errorHandler(500, error.message));
+}
 };
 const removeMcc = async (req, res, next) => {
   const { email, ...rest } = req.body;
