@@ -26,15 +26,23 @@ const farmerSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
-    match: [
-      /(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/,
-      "Please provide a valid password",
-    ],
+    required: false,
+    // match: [
+    //   /(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{6,16}$/,
+    //   "Please provide a valid password",
+    // ],
   },
   verified: {
     type: String,
     default: false,
+  },
+  province: {
+    type: String,
+    required: true,
+  },
+  district: {
+    type: String,
+    required: true,
   },
   sector: {
     type: String,
@@ -44,6 +52,10 @@ const farmerSchema = new Schema({
     type: Number,
     default: 0,
     required: false,
+  },
+  role: {
+    type: String,
+    default: "farmer",
   },
 });
 const FarmerModel = model("farmer", farmerSchema);

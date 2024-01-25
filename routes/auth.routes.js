@@ -43,22 +43,10 @@
  *         fullName: John Doe
  *         email: email@example.com
  *         password: myPassword!
- *         role: Admin 
+ *         role: Admin
  *         phoneNumber: +1234567890
  *         confirmPassword: myPassword!
- *         nationalId: ABC123XYZ
- */
-
-
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- *   schemas:
+ *         nationalId: 123456789999999876
  *     login:
  *       type: object
  *       required:

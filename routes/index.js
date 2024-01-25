@@ -7,6 +7,10 @@ const milkProductionRoutes = require("./milkProduction.routes"); // Import milk 
 const express = require("express");
 const mccRouter = require("./veterinary.routes");
 const mccUserRouter = require("./mccUser.routes");
+const {
+  globalErrorController,
+} = require("../controller/Errors/errorController");
+const { errorHandler } = require("../utility/errorHandlerClass");
 
 // All routes
 const allRoutes = express.Router();
@@ -32,6 +36,9 @@ mccRouters.use("/mcc", mccRouter);
 mccUserRouters.use("/mccUser", mccUserRoute);
 //milkProduction routes
 milkProductionRouters.use("/milkProduction", milkProductionRoutes);
+milkProductionRouters.all("*", (req, res, next) => {
+  next(new errorHandler(`Failure connecting to the server!`, 404));
+});
 
 module.exports = {
   allRoutes,

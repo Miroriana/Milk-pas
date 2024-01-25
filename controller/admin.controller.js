@@ -2,48 +2,54 @@ const sendEmail = require("../utils/email");
 const bcryptjs = require("bcryptjs");
 const VeterinaryModel = require("../models/admin.model");
 // const { UserSigninSchema } = require("../utils/validation");
-const errorHandler = require("../errors/errorhandler");
 const { generateRandomPassword } = require("../utility/generateRandomPassword");
 const sendVeterinaryEmail = require("../middlewares/veterinaryEmail");
+const { errorHandler } = require("../utility/errorHandlerClass");
+const { catchAsyncError } = require("../utility/catchSync");
 //adding a veterinaryc
 
-const addVeterian = async (req, res, next) => {
+const addVeterian = catchAsyncError(async (req, res, next) => {
+  const admin = req.user;
+
+  const role = toString(admin.admin);
+
+  if (!role !== "") {
+    return next(
+      new errorHandler(`Access Denied. You are not authorized.`, 400)
+    );
+  }
   const { email, ...rest } = req.body;
   // var a = UserSigninSchema.validateAsync({email:req.body.email, password: req.body.password, nationalId: req.body.nationalId});
-  try {
-    var veterianExists = await VeterinaryModel.findOne({
-      email: req.body.email,
+  var veterianExists = await VeterinaryModel.findOne({
+    email: req.body.email,
+  });
+  if (veterianExists) {
+    return res
+      .status(200)
+      .json({ message: "veterinary with this email already exists" });
+  } else {
+    let defaultPassword = generateRandomPassword(12);
+    let hashedPwd = bcryptjs.hashSync(defaultPassword, 10);
+
+    console.log("defaultPassword---", defaultPassword);
+
+    req.body.password = hashedPwd;
+    req.body.role = "veterinary";
+
+    var addedVeterinary = await VeterinaryModel.create(req.body);
+    var senderEmail = addedVeterinary.email;
+    var subject = "Finished signing up your account";
+    signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedVeterinary.email} <br> Password: ${defaultPassword}  <br>  <br>   </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
+    sendEmail(senderEmail, subject, signUpLink);
+
+    res.status(201).json({
+      message:
+        "Veterinary is recorded successfully, email is sent to the veterinary",
+      veterian: addedVeterinary,
+      defaultPassword,
     });
-    if (veterianExists) {
-      return res
-        .status(200)
-        .json({ message: "veterinary with this email already exists" });
-    } else {
-      let defaultPassword = generateRandomPassword(12);
-      let hashedPwd = bcryptjs.hashSync(defaultPassword, 10);
-
-      console.log("defaultPassword---", defaultPassword);
-
-      req.body.password = hashedPwd;
-
-      var addedVeterinary = await VeterinaryModel.create(req.body);
-      // sending email codes
-      var senderEmail = addedVeterinary.email;
-      var subject = "Finished signing up your account";
-      signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedVeterinary.email} <br> Password: ${defaultPassword}  <br>  <br>   </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
-      sendEmail(senderEmail, subject, signUpLink);
-
-      res.status(201).json({
-        message:
-          "Veterinary is recorded successfully, email is sent to the veterinary",
-        veterian: addedVeterinary,
-      });
-    }
-  } catch (error) {
-    next(errorHandler(500, error.message));
   }
-};
-
+});
 
 const removeVeterinary = async (req, res, next) => {
   const { email, ...rest } = req.body;
@@ -64,7 +70,7 @@ const removeVeterinary = async (req, res, next) => {
       res.status(404).send("Veterinary not found!");
     }
   } catch (error) {
-    next(errorHandler(500, error.message));
+    next(new errorHandler(500, error.message));
   }
 };
 
@@ -73,7 +79,7 @@ const findVeterinaryById = async (req, res, next) => {
   var veterinary = await VeterinaryModel.findById(req.query.id);
   try {
     if (veterinary === null) {
-      return next(errorHandler(400, "No Veterinary with given ID"));
+      return next(new errorHandler(400, "No Veterinary with given ID"));
     }
     res.json({
       message: "veterinary is found",
@@ -88,7 +94,7 @@ const listOfVeterinary = async (req, res, next) => {
   var veterinaryList = await VeterinaryModel.find();
   try {
     if (veterinaryList === null) {
-      return next(errorHandler(400, "No Veterinary with given ID"));
+      return next(new errorHandler(400, "No Veterinary with given ID"));
     }
     res.json({
       message: "this is the veterinary list",

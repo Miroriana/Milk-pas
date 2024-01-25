@@ -23,8 +23,8 @@ const UserSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ["user", "admin", "veterian", "mccUser"], // only allow the values 'User' and 'Admin
-      default: "admin",
+      enum: ["user", "admin", "veterinary", "farmer", "mccUser"],
+      default: "user",
     },
     phoneNumber: {
       type: String,

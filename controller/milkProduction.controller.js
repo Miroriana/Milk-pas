@@ -1,6 +1,5 @@
 const milkProductionModel = require("../models/milkProduction.model");
 const farmerModel = require("../models/farmer.model");
-const errorHandler = require("../errors/errorhandler");
 const MilkModel = require("../models/milkProduction.model");
 
 // Add milk production record
@@ -28,8 +27,15 @@ const MilkModel = require("../models/milkProduction.model");
 // }};
 const addmilkProduction = async (req, res, next) => {
   try {
-    // Find the farmer by ID from the request body
-    const existFarmer = await farmerModel.findById(req.body.farmerId);
+    const farmerEmail = req.user.email;
+
+    const farmer = await farmerModel.findOne({ email: farmerEmail });
+
+    if (!farmer) {
+      return next(
+        new errorHandler(`Access Denied. You are not authorized.`, 400)
+      );
+    }
 
     // Get the new milk production quantity from the request body
     var newCollection = {
@@ -74,7 +80,7 @@ const addedMilkProduction = async (req, res, next) => {
       addedQuantity,
     });
   } catch (error) {
-    next(errorHandler(400, error.message));
+    next(new errorHandler(400, error.message));
   }
 };
 

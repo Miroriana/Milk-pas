@@ -1,7 +1,6 @@
 const { UserModel, MccModel } = require("../models/user.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const errorHandler = require("../errors/errorhandler");
 const asyncWrapper = require("../middlewares/async");
 const {
   userAccountSignUpValidationSchema,
@@ -13,10 +12,14 @@ const { v4: uuidv4 } = require("uuid");
 const { getToken } = require("../utility/webTokenValidation");
 const sendEmail = require("../utils/email");
 const VeterinaryModel = require("../models/admin.model");
+const { errorHandler } = require("../utility/errorHandlerClass");
+const { catchAsyncError } = require("../utility/catchSync");
+const FarmerModel = require("../models/farmer.model");
+const MccUserModel = require("../models/mccUser.model");
 
 //sign up admin
 
-const SignUp = async (req, res, next) => {
+const SignUp = catchAsyncError(async (req, res, next) => {
   const {
     fullName,
     email,
@@ -27,76 +30,73 @@ const SignUp = async (req, res, next) => {
     nationalId,
   } = req.body;
   // console.log(req.body);
-  try {
-    var userExists = await UserModel.findOne({ email: email });
-    // console.log(userExists);
-    if (userExists)
-      return next(errorHandler(401, "User with this email already exists"));
-    else {
-      const hashedPassword = bcryptjs.hashSync(password, 10);
+  var userExists = await UserModel.findOne({ email: email });
+  // console.log(userExists);
+  if (userExists)
+    return next(new errorHandler(401, "User with this email already exists"));
+  else {
+    const hashedPassword = bcryptjs.hashSync(password, 10);
 
-      var newUser = new UserModel({
-        email: email,
-        password: hashedPassword,
-        fullName: fullName,
-        phoneNumber: phoneNumber,
-        confirmPassword: confirmPassword,
-        nationalId: nationalId,
-        role: role,
-      });
+    var newUser = new UserModel({
+      email: email,
+      password: hashedPassword,
+      fullName: fullName,
+      phoneNumber: phoneNumber,
+      confirmPassword: confirmPassword,
+      nationalId: nationalId,
+      role: role,
+    });
 
-      var savedUser = await newUser.save();
-      res.status(201).json({ message: "Account created!" });
-      // console.log(savedUser);
-    }
-  } catch (error) {
-    return next(errorHandler(500, error.message));
+    var savedUser = await newUser.save();
+    res.status(201).json({ message: "Account created!", newUser });
+    // console.log(savedUser);
   }
-};
+});
 
 // sign in for the admin
-const SignIn = async (req, res, next) => {
+const SignIn = catchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
-  try {
-    let validUser = await UserModel.findOne({ email: email });
+  let validUser = await UserModel.findOne({ email: email });
+  if (!validUser) {
+    validUser = await VeterinaryModel.findOne({ email: email });
     if (!validUser) {
-      validUser = await VeterinaryModel.findOne({ email: email });
-      if (!validUser)
-        return next(errorHandler(401, "Invalid email or password"));
+      validUser = await FarmerModel.findOne({ email: email });
+      if (!validUser) {
+        validUser = await MccUserModel.findOne({ email: email });
+
+        if (!validUser)
+          return next(new errorHandler(401, "Invalid email or password"));
+      }
     }
-
-    const validPassword = bcryptjs.compareSync(password, validUser.password);
-    if (!validPassword)
-      return next(errorHandler(401, "Invalid email or password"));
-
-    const token = jwt.sign({ id: validUser._id }, process.env.JWT_SECRET_KEY);
-    const { password: hashedPassword, ...rest } = validUser._doc;
-
-    const expiryDate = new Date(Date.now() + 3600000); //1hour
-
-    let Accesstoken = getToken({ _id: validUser._id, email: validUser.email });
-
-    res.status(200).json({
-      message: "Authorised!",
-      access_token: Accesstoken,
-      user: {
-        userId: validUser._id,
-        email: validUser.email,
-        fullNames: validUser.fullNames,
-        phoneNo: validUser.phoneNo,
-        role: validUser.role,
-      },
-    });
-  } catch (error) {
-    console.log("Error loggin--", error);
-    next(errorHandler(error));
   }
-};
+
+  const validPassword = bcryptjs.compareSync(password, validUser.password);
+  if (!validPassword)
+    return next(new errorHandler(401, "Invalid email or password"));
+
+  const { password: hashedPassword, ...rest } = validUser._doc;
+
+  const expiryDate = new Date(Date.now() + 3600000); //1hour
+
+  let Accesstoken = getToken({ _id: validUser._id, email: validUser.email });
+
+  res.status(200).json({
+    message: "Access granted!",
+    access_token: Accesstoken,
+    user: {
+      userId: validUser._id,
+      email: validUser.email,
+      fullNames: validUser.fullName,
+      phoneNo: validUser.phoneNo,
+      role: validUser.role,
+    },
+  });
+});
 //reset password for admin
 const ResetPassword = async (req, res, next) => {
   try {
     const validUser = await UserModel.findOne({ email: req.body.email });
-    if (!validUser) return next(errorHandler(401, "Invalid email"));
+    if (!validUser) return next(new errorHandler(401, "Invalid email"));
 
     var token = jwt.sign({ email: req.body }, process.env.JWT_SECRET_KEY, {
       expiresIn: 1200,
@@ -110,7 +110,7 @@ const ResetPassword = async (req, res, next) => {
       .status(200)
       .json({ message: `Password reset link sent to your email!` });
   } catch (error) {
-    // next(errorHandler(error));
+    // next(new errorHandler(error));
     res.status(500).json(error.message);
   }
 };

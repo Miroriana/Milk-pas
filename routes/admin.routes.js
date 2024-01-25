@@ -1,6 +1,11 @@
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Veterinary:
  *       type: object
@@ -11,58 +16,63 @@
  *         - phoneNumber
  *         - province
  *         - district
- *         - password
  *       properties:
  *         fullName:
  *           type: string
  *           description: Name of the veterinary
+ *           example: John Doe
  *         email:
  *           type: string
  *           description: Email of the veterinary
+ *           example: john.doe@example.com
  *         phoneNumber:
  *           type: string
  *           description: Phone number of the veterinary
+ *           example: +1234567890
  *         nationalId:
  *           type: number
  *           description: National ID of the veterinary
- *         password:
- *           type: string
- *           description: Password of the veterinary
+ *           example: 123456789
  *         province:
  *           type: string
  *           description: Province of the veterinary
+ *           example: prov1
  *         district:
  *           type: string
  *           description: District of the veterinary
+ *           example: distr1
  */
-/** 
+
+/**
  * @swagger
- * tags: 
+ * tags:
  *   - name: Veterinary
  *     description: The farmer managing API
  * /mpas/veterian/vet/allVets:
  *   get:
  *     summary: List of all veterinaries
  *     tags:
- *       - Veterinary  
+ *       - Veterinary
  *     responses:
  *       200:
  *         description: This is the veterinary list
- *         content: 
+ *         content:
  *           application/json:
  *             schema:
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Veterinary'
  */
-/** 
+/**
  * @swagger
- * 
+ *
  * /mpas/veterian/vet/addVet:
  *   post:
  *     summary: Create a veterinary
  *     tags:
  *       - Veterinary
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -72,7 +82,7 @@
  *     responses:
  *       200:
  *         description: This Veterinary is created
- *         content: 
+ *         content:
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Veterinary'  # Corrected schema reference to match the case
@@ -116,6 +126,8 @@
  *     summary: Remove veterinarian
  *     tags:
  *       - Veterinary
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: id
@@ -127,7 +139,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Veterinary' 
+ *               $ref: '#/components/schemas/Veterinary'
  *       '500':
  *         description: Some server error
  *       '400':
@@ -158,9 +170,8 @@
  *         description: Bad request
  */
 
-
-
 const express = require("express");
+const { verifyToken } = require("../middlewares/tokenVerification");
 const {
   addVeterian,
   removeVeterinary,
@@ -171,8 +182,8 @@ const {
 
 const adminRouter = express.Router();
 
-adminRouter.post("/addVet", addVeterian);
-adminRouter.delete("/removeVet", removeVeterinary);
+adminRouter.post("/addVet", verifyToken, addVeterian);
+adminRouter.delete("/removeVet", verifyToken, removeVeterinary);
 adminRouter.get("/findVet", findVeterinaryById);
 adminRouter.get("/allVets", listOfVeterinary);
 adminRouter.patch("/updateVet", updateVeterinary);

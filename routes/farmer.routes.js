@@ -1,6 +1,11 @@
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Farmer:
  *       type: object
@@ -11,39 +16,32 @@
  *         - nationalId
  *         - verified
  *         - sector
- *         - quantity
- *         - description
  *       properties:
  *         fullName:
  *           type: string
  *           description: Name of the farmer
+ *           example: John Farmer
  *         email:
  *           type: string
  *           description: Email of the farmer
+ *           example: john.farmer@example.com
  *         phoneNumber:
  *           type: string
  *           description: Phone number of the farmer
+ *           example: +1234567890
  *         nationalId:
  *           type: number
  *           description: National ID of the farmer
- *         password:
- *           type: string
- *           description: Password of the farmer
- *         verified:
- *           type: string
- *           description: Verification status of the farmer
+ *           example: 123456789
  *         sector:
  *           type: string
  *           description: Sector of the farmer
- *         quantity:
- *           type: string
- *           description: Quantity related to the farmer
+ *           example: sect1
  */
 
-
-/** 
+/**
  * @swagger
- * tags: 
+ * tags:
  *   - name: Farmer
  *     description: The farmer managing API
  * /mpas/farmerNews/farmer/allFarmers:
@@ -54,7 +52,7 @@
  *     responses:
  *       200:
  *         description: This is the farmer list
- *         content: 
+ *         content:
  *           application/json:
  *             schema:
  *               type: array
@@ -69,6 +67,8 @@
  *     summary: Create a farmer
  *     tags:
  *       - Farmer
+ *     security:
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -92,6 +92,8 @@
  *     summary: Update farmer
  *     tags:
  *       - Farmer
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: id
@@ -122,6 +124,8 @@
  *     summary: removing a farmer
  *     tags:
  *       - Farmer
+ *     security:
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: id
@@ -178,11 +182,12 @@ const {
   listOfFarmer,
   updateFarmer,
 } = require("../controller/farmer.controller");
+const { verifyToken } = require("../middlewares/tokenVerification");
 const farmerRoute = express.Router();
 
-farmerRoute.post("/addFarmer", addFarmer);
-farmerRoute.delete("/deleteFarmer", removeFarmer);
-farmerRoute.get("/findFarmer", findFarmerById);
+farmerRoute.post("/addFarmer", verifyToken, addFarmer);
+farmerRoute.delete("/deleteFarmer", verifyToken, removeFarmer);
+farmerRoute.get("/findFarmer", verifyToken, findFarmerById);
 farmerRoute.get("/allFarmers", listOfFarmer);
 farmerRoute.patch("/updateFarmers", updateFarmer);
 

@@ -12,6 +12,18 @@ const milkSchema = new Schema(
       required: true,
       unique: false,
     },
+    province: {
+      type: String,
+      required: true,
+    },
+    district: {
+      type: String,
+      required: true,
+    },
+    sector: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

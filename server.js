@@ -15,6 +15,10 @@ require("colors");
 const app = express();
 const swaggerui = require("swagger-ui-express");
 const swaggerjsdocs = require("swagger-jsdoc");
+const {
+  globalErrorController,
+} = require("./controller/Errors/errorController");
+const { errorHandler } = require("./utility/errorHandlerClass");
 
 app.use(cors());
 
@@ -35,6 +39,7 @@ app.use("/mpas", mccRouters);
 app.use("/mpas", mccUserRouters);
 //milkProductionRoutes
 app.use("/mpas", milkProductionRouters);
+app.use(globalErrorController);
 //swagger connection
 const options = {
   definition: {
@@ -52,11 +57,11 @@ const options = {
     },
     servers: [
       {
-        url: "https://milk-production-analytical-system.onrender.com/" ,
+        url: "https://milk-production-analytical-system.onrender.com/",
       },
       {
         url: "http://localhost:5678/",
-      }
+      },
     ],
   },
   apis: ["./routes/*.js"],

@@ -1,6 +1,6 @@
 const MccUserModel = require("../models/mccUser.model");
+const { errorHandler } = require("../utility/errorHandlerClass");
 const sendEmail = require("../utils/email");
-const errorHandler = require("../errors/errorhandler");
 
 const addMccUser = async (req, res, next) => {
   const { email, ...rest } = req.body;
@@ -24,7 +24,7 @@ const addMccUser = async (req, res, next) => {
       });
     }
   } catch (error) {
-    next(errorHandler(500, error.message));
+    next(new errorHandler(500, error.message));
   }
 };
 
@@ -43,7 +43,7 @@ const removeMccUser = async (req, res, next) => {
       res.status(404).send("mccUser is not found!");
     }
   } catch (error) {
-    next(errorHandler(500, error.message));
+    next(new errorHandler(500, error.message));
   }
 };
 
@@ -52,7 +52,7 @@ const findMccUserById = async (req, res, next) => {
   var MccUser = await MccUserModel.findById(req.query.id);
   try {
     if (MccUser === null) {
-      return next(errorHandler(400, "No mccUser with given ID"));
+      return next(new errorHandler(400, "No mccUser with given ID"));
     }
     res.json({
       message: "mccUser is found",
@@ -71,7 +71,7 @@ const listOfMccUser = async (req, res, next) => {
       MccUserList,
     });
   } catch (error) {
-    next(errorHandler(500, "There is no MccUsers in the database"));
+    next(new errorHandler(500, "There is no MccUsers in the database"));
   }
 };
 //updating a Mcc's information according to his email

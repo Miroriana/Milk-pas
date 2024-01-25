@@ -1,30 +1,51 @@
 const FarmerModel = require("../models/farmer.model");
 const express = require("express");
-const { errorHandler } = require("../errors/errorhandler");
+const bcryptjs = require("bcryptjs");
+const { errorHandler } = require("../utility/errorHandlerClass");
+const VeterinaryModel = require("../models/admin.model");
+const { catchAsyncError } = require("../utility/catchSync");
+const { generateRandomPassword } = require("../utility/generateRandomPassword");
 
 //add farmer for the first time
-const addFarmer = async (req, res, next) => {
-  const { email } = req.body;
-  try {
-    var farmerExists = await FarmerModel.findOne({ email: email });
-    if (farmerExists)
-      return res
-        .status(200)
-        .json({ message: "Farmer with this email already exists" });
-    else {
-      var addedFarmer = await FarmerModel.create(req.body);
-      // const newFarmer = new FarmerModel(req.body);
-      // var addedFarmer = newFarmer.save();
-      res.status(201).json({
-        message: "Farmer recorded successfully",
-        farmer: addedFarmer,
-      });
-      // console.log(res);
-    }
-  } catch (error) {
-    res.status(500).send("Failed to save the farmer ...");
+const addFarmer = catchAsyncError(async (req, res, next) => {
+  const veterinaryEmail = req.user.email;
+
+  const veterinary = await VeterinaryModel.findOne({
+    email: veterinaryEmail,
+  });
+
+  if (!veterinary) {
+    return next(
+      new errorHandler(`Access Denied. You are not authorized.`, 400)
+    );
   }
-};
+  const { email } = req.body;
+  var farmerExists = await FarmerModel.findOne({ email: email });
+  if (farmerExists)
+    return res
+      .status(200)
+      .json({ message: "Farmer with this email already exists" });
+  else {
+    req.body.province = veterinary.province;
+    req.body.district = veterinary.district;
+
+    let defaultPassword = generateRandomPassword(12);
+    let hashedPwd = bcryptjs.hashSync(defaultPassword, 10);
+
+    console.log("defaultPassword---", defaultPassword);
+
+    req.body.password = hashedPwd;
+    req.body.role = "farmer";
+
+    var addedFarmer = await FarmerModel.create(req.body);
+    res.status(201).json({
+      message: "Farmer recorded successfully",
+      farmer: addedFarmer,
+      defaultPassword,
+    });
+    // console.log(res);
+  }
+});
 // removing a recorded farmer
 const removeFarmer = async (req, res, next) => {
   try {
