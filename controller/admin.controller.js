@@ -44,7 +44,6 @@ const addVeterian = async (req, res, next) => {
   }
 };
 
-// // remove veterinary
 
 const removeVeterinary = async (req, res, next) => {
   const { email, ...rest } = req.body;
