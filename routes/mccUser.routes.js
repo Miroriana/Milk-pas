@@ -1,6 +1,11 @@
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     mccUser:
  *       type: object
@@ -32,6 +37,39 @@
  *           description: Verification status of the MCC user
  */
 
+/**
+ * @swagger
+ * tags:
+ *   name: mccUser
+ *   description: The mcc user managing API
+ */
+
+/**
+ * @swagger
+ * /mpas/mccUser/addMccUser:
+ *   post:
+ *     summary: Create a mcc
+ *     tags:
+ *       - mccUser
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/mccUser'
+ *     responses:
+ *       200:
+ *         description: This mcc is created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/mccUser'
+ *       500:
+ *         description: Some server error
+ */
+
 const express = require("express");
 const {
   addMccUser,
@@ -40,10 +78,11 @@ const {
   listOfMccUser,
   updateMccUser,
 } = require("../controller/mccUser.controller");
+const { verifyToken } = require("../middlewares/tokenVerification");
 
 const mccUserRouter = express.Router();
 
-mccUserRouter.post("/addMccUser", addMccUser);
+mccUserRouter.post("/addMccUser", verifyToken, addMccUser);
 mccUserRouter.delete("/removeMccUser", removeMccUser);
 mccUserRouter.get("/findMccUser", findMccUserById);
 mccUserRouter.get("/allMccUser", listOfMccUser);

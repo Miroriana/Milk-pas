@@ -1,34 +1,57 @@
+const VeterinaryModel = require("../models/admin.model");
+const FarmerModel = require("../models/farmer.model");
 const MccUserModel = require("../models/mccUser.model");
+const { catchAsyncError } = require("../utility/catchSync");
+const bcryptjs = require("bcryptjs");
 const { errorHandler } = require("../utility/errorHandlerClass");
+const { generateRandomPassword } = require("../utility/generateRandomPassword");
 const sendEmail = require("../utils/email");
 
-const addMccUser = async (req, res, next) => {
-  const { email, ...rest } = req.body;
-  try {
-    var mccUserExists = await MccUserModel.findOne({ email: req.body.email });
-    if (mccUserExists) {
-      return res
-        .status(200)
-        .json({ message: "MccUser with this email already exists" });
-    } else {
-      var addedMccUser = await MccUserModel.create(req.body);
-      // sending email codes
-      var senderEmail = addedMccUser.email;
-      var subject = "Finished signing up your account";
-      signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedMccUser.email} <br> Password: ${addedMccUser.password}  </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
-      sendEmail(senderEmail, subject, signUpLink);
+const addMccUser = catchAsyncError(async (req, res, next) => {
+  const veterinaryEmail = req.user.email;
 
-      res.status(201).json({
-        message: "mccUser is recorded successfully, email is sent to the mcc",
-        veterian: addedMccUser,
-      });
-    }
-  } catch (error) {
-    next(new errorHandler(500, error.message));
+  const veterinary = await VeterinaryModel.findOne({
+    email: veterinaryEmail,
+  });
+
+  if (!veterinary) {
+    return next(
+      new errorHandler(`Access Denied. You are not authorized.`, 400)
+    );
   }
-};
+  const { email, ...rest } = req.body;
+  var mccUserExists = await MccUserModel.findOne({ email: req.body.email });
+  if (mccUserExists) {
+    return res
+      .status(200)
+      .json({ message: "MccUser with this email already exists" });
+  } else {
+    req.body.province = veterinary.province;
+    req.body.district = veterinary.district;
+    req.body.sector = veterinary.sector;
 
-// // remove mcc
+    let defaultPassword = generateRandomPassword(12);
+    let hashedPwd = bcryptjs.hashSync(defaultPassword, 10);
+
+    console.log("defaultPassword---", defaultPassword);
+
+    req.body.password = hashedPwd;
+    req.body.role = "mccUser";
+
+    var addedMccUser = await MccUserModel.create(req.body);
+    // sending email codes
+    var senderEmail = addedMccUser.email;
+    var subject = "Finished signing up your account";
+    signUpLink = `<p> <h3>Hello Veterinary! </h3>Welcome to our Team!! Here are your credentials<br> User email: ${addedMccUser.email} <br> Password: ${addedMccUser.password}  </p> <a href="http://localhost:4000/api/UH/v1/user/auth/signup">Sign in to continue</a>`;
+    sendEmail(senderEmail, subject, signUpLink);
+
+    res.status(201).json({
+      message: "mccUser is recorded successfully, email is sent to the mcc",
+      veterian: addedMccUser,
+      defaultPassword,
+    });
+  }
+});
 
 const removeMccUser = async (req, res, next) => {
   const { email, ...rest } = req.body;

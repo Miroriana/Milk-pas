@@ -1,5 +1,6 @@
 //registering the mcc
 // const { UserSigninSchema } = require("../utils/validation");
+const FarmerModel = require("../models/farmer.model");
 const MccModel = require("../models/veterian.model");
 
 const addMcc = async (req, res, next) => {
@@ -28,6 +29,17 @@ const addMcc = async (req, res, next) => {
   //     next(new errorHandler(500, error.message));
   //   }
   // };
+  
+  const farmerEmail = req.user.email;
+
+  const farmer = await FarmerModel.findOne({
+    email: farmerEmail,
+  });
+  if (!farmer) {
+    return next(
+      new errorHandler(400, `Access Denied. You are not authorized.`)
+    );
+  }
   try {
     // Check if an Mcc with the given fullName already exists
     var mccExists = await MccModel.findOne({ mccName: req.body.mccName });

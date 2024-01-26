@@ -78,7 +78,11 @@ const SignIn = catchAsyncError(async (req, res, next) => {
 
   const expiryDate = new Date(Date.now() + 3600000); //1hour
 
-  let Accesstoken = getToken({ _id: validUser._id, email: validUser.email });
+  let Accesstoken = getToken({
+    _id: validUser._id,
+    email: validUser.email,
+    role: validUser.role,
+  });
 
   res.status(200).json({
     message: "Access granted!",

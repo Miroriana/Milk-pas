@@ -37,7 +37,7 @@ mccUserRouters.use("/mccUser", mccUserRoute);
 //milkProduction routes
 milkProductionRouters.use("/milkProduction", milkProductionRoutes);
 milkProductionRouters.all("*", (req, res, next) => {
-  next(new errorHandler(`Failure connecting to the server!`, 404));
+  next(new errorHandler(404, `Failure connecting to the server!`));
 });
 
 module.exports = {

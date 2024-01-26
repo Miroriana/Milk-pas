@@ -1,6 +1,7 @@
 const milkProductionModel = require("../models/milkProduction.model");
 const farmerModel = require("../models/farmer.model");
 const MilkModel = require("../models/milkProduction.model");
+const { errorHandler } = require("../utility/errorHandlerClass");
 
 // Add milk production record
 //const addmilkProduction = async (req, res, next) => {
@@ -33,7 +34,7 @@ const addmilkProduction = async (req, res, next) => {
 
     if (!farmer) {
       return next(
-        new errorHandler(`Access Denied. You are not authorized.`, 400)
+        new errorHandler(400, `Access Denied. You are not authorized.`)
       );
     }
 

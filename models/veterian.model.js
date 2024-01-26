@@ -1,5 +1,4 @@
 const { Schema, model } = require("mongoose");
-//veterinary model: mcc registration
 const mccSchema = new Schema({
   mccName: {
     type: String,
@@ -27,6 +26,10 @@ const mccSchema = new Schema({
       "Please provide a valid password",
     ],
   },
+  province: {
+    type: String,
+    required: false,
+  },
   district: {
     type: String,
     required: true,
@@ -34,8 +37,7 @@ const mccSchema = new Schema({
   sector: {
     type: String,
     required: true,
-  }
-
-})
+  },
+});
 const MccModel = model("mcc", mccSchema);
 module.exports = MccModel;

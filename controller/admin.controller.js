@@ -9,11 +9,10 @@ const { catchAsyncError } = require("../utility/catchSync");
 //adding a veterinaryc
 
 const addVeterian = catchAsyncError(async (req, res, next) => {
-  const admin = req.user;
+  const requestingUser = req.user;
 
-  const role = toString(admin.admin);
 
-  if (!role !== "") {
+  if (requestingUser.role !== "admin") {
     return next(
       new errorHandler(`Access Denied. You are not authorized.`, 400)
     );
